@@ -45,7 +45,7 @@ public class Server {
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                }catch (IOException e){
+                } catch (IOException e){
 
                 }
             }
@@ -69,7 +69,7 @@ public class Server {
                 try {
                     JSONObject json = getJson(exchange);
                     Task task = new Task(json, solver, exchange);
-                    taskQueue.add(task);    // currently not used
+                    taskQueue.add(task);
                 } catch (IOException e) {
                     response = "Error reading the request body";
                     exchange.sendResponseHeaders(400, response.length());
