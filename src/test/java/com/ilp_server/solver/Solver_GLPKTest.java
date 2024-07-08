@@ -98,7 +98,11 @@ class Solver_GLPKTest {
                 "    ],\n" +
                 "    \"optimizationFunction\":\"z_c0 + z_c1 + z_c2 + z_c3\"\n" +
                 " }");
+
+
+
         JSONObject output = solver.solve(input);
-        assertEquals("{\"solution\": \"not implemented\"}", output.toString());
+        assertEquals("{\"result\":[{\"variable\":\"x_v0_c0\",\"value\":\"0\"},{\"variable\":\"x_v0_c1\",\"value\":\"0\"},{\"variable\":\"x_v0_c2\",\"value\":\"0\"},{\"variable\":\"x_v0_c3\",\"value\":\"0\"},{\"variable\":\"x_v1_c0\",\"value\":\"0\"},{\"variable\":\"x_v1_c1\",\"value\":\"0\"},{\"variable\":\"x_v1_c2\",\"value\":\"0\"},{\"variable\":\"x_v1_c3\",\"value\":\"0\"},{\"variable\":\"x_v2_c0\",\"value\":\"0\"},{\"variable\":\"x_v2_c1\",\"value\":\"0\"},{\"variable\":\"x_v2_c2\",\"value\":\"0\"},{\"variable\":\"x_v2_c3\",\"value\":\"0\"},{\"variable\":\"y_e0_c0\",\"value\":\"0\"},{\"variable\":\"y_e0_c1\",\"value\":\"0\"},{\"variable\":\"y_e0_c2\",\"value\":\"0\"},{\"variable\":\"y_e0_c3\",\"value\":\"0\"},{\"variable\":\"y_e1_c0\",\"value\":\"0\"},{\"variable\":\"y_e1_c1\",\"value\":\"0\"},{\"variable\":\"y_e1_c2\",\"value\":\"0\"},{\"variable\":\"y_e1_c3\",\"value\":\"0\"},{\"variable\":\"y_e2_c0\",\"value\":\"0\"},{\"variable\":\"y_e2_c1\",\"value\":\"0\"},{\"variable\":\"y_e2_c2\",\"value\":\"0\"},{\"variable\":\"y_e2_c3\",\"value\":\"0\"},{\"variable\":\"z_c0\",\"value\":\"0\"},{\"variable\":\"z_c1\",\"value\":\"0\"},{\"variable\":\"z_c2\",\"value\":\"0\"},{\"variable\":\"z_c3\",\"value\":\"0\"}],\"errorMessage\":\"\",\"error\":false}", output.toString());
+        //This test is not very usefull as of yet, need an input and proper desired output
     }
 }
