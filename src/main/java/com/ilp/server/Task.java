@@ -1,6 +1,6 @@
-package com.ilp_server;
+package com.ilp.server;
 
-import com.ilp_server.solver.Solver;
+import com.ilp.server.solver.Solver;
 import com.sun.net.httpserver.HttpExchange;
 import org.json.JSONObject;
 

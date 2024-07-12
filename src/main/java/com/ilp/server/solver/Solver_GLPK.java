@@ -1,5 +1,6 @@
-package com.ilp_server.solver;
+package com.ilp.server.solver;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -14,12 +15,12 @@ import java.util.ArrayList;
 
 public class Solver_GLPK implements Solver{
     public JSONObject solve(JSONObject input){
-        String glpkInput = translateToGLPK(input);
         try {
+            String glpkInput = translateToGLPK(input);
             String glpkOutput = callGLPK(glpkInput);
             return translateFromGLPK(glpkOutput);
-        } catch (IOException | InterruptedException e){
-            return errorMsg(e.getMessage());
+        } catch (IOException | InterruptedException | JSONException e){
+            return errorMsg(e.getMessage().replace("\"", "\\\""));
         }
     }
 
@@ -28,7 +29,7 @@ public class Solver_GLPK implements Solver{
      * @param input The JSON object to translate.
      * @return The GLPK input file.
      */
-    private String translateToGLPK(JSONObject input){
+    private String translateToGLPK(JSONObject input) throws JSONException {
         JSONArray vars = input.getJSONArray("variables");
         JSONArray constraints = input.getJSONArray("constraints");
         String optimizationFunc = input.get("optimizationFunction").toString();
@@ -46,10 +47,11 @@ public class Solver_GLPK implements Solver{
             sb.append(constraints.getString(i));
             sb.append(";\n");
         }
-        sb.append("maximize obj: ");
+        sb.append("minimize obj: ");
         sb.append(optimizationFunc);
         sb.append(";\n");
         sb.append("end;");
+        System.out.println(sb);
         return sb.toString();
     }
 

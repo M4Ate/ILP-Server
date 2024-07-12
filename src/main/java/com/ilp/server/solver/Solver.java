@@ -1,4 +1,4 @@
-package com.ilp_server.solver;
+package com.ilp.server.solver;
 import org.json.JSONObject;
 
 /**
@@ -13,7 +13,7 @@ public interface Solver {
      * @param input The ILP problem to solve.
      * @return The solution to the ILP problem.
      */
-    public JSONObject solve(JSONObject input);
+    JSONObject solve(JSONObject input);
 
 
 
