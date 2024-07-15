@@ -45,15 +45,18 @@ public class Server {
             while (true) {
                 try {
                     Task task = taskQueue.take();
+                    long startTime = System.currentTimeMillis();
                     task.start();
-                    if (task.getStatus() == Status.FINISHED) {
-                        JSONObject output = task.getOutput();
-                        String response = output.toString();
-                        task.getExchange().sendResponseHeaders(200, response.length());
-                        OutputStream outputStream = task.getExchange().getResponseBody();
-                        outputStream.write(response.getBytes());
-                        outputStream.close();
-                    }
+                    long endTime = System.currentTimeMillis();
+                    System.out.println("Task completed in " + (endTime - startTime) + "ms");
+
+                    JSONObject output = task.getOutput();
+                    String response = output.toString();
+                    task.getExchange().sendResponseHeaders(200, response.length());
+                    OutputStream outputStream = task.getExchange().getResponseBody();
+                    outputStream.write(response.getBytes());
+                    outputStream.close();
+
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 } catch (IOException e) {
@@ -80,6 +83,7 @@ public class Server {
                     JSONObject json = getJson(exchange);
                     Task task = new Task(json, solver, exchange);
                     taskQueue.add(task);
+                    System.out.println("Received new task");
                 } catch (IOException e) {
                     response = "Error reading the request body";
                     exchange.sendResponseHeaders(400, response.length());
