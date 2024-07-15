@@ -37,8 +37,8 @@ public class Solver_GLPK implements Solver{
         for (Object var : vars){
             sb.append("var ");
             sb.append(var.toString());
-            sb.append(" binary;\n");            //might be faster
-            //sb.append(" >= 0, integer;\n");
+            //sb.append(" binary;\n");            // using integer seems slightly faster
+            sb.append(" >= 0, integer;\n");
         }
         for (int i = 0; i < constraints.length(); i++){
             sb.append("s.t. ");
