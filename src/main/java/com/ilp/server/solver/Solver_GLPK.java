@@ -37,7 +37,8 @@ public class Solver_GLPK implements Solver{
         for (Object var : vars){
             sb.append("var ");
             sb.append(var.toString());
-            sb.append(" >= 0, integer;\n");
+            sb.append(" binary;\n");            //might be faster
+            //sb.append(" >= 0, integer;\n");
         }
         for (int i = 0; i < constraints.length(); i++){
             sb.append("s.t. ");
@@ -84,11 +85,11 @@ public class Solver_GLPK implements Solver{
         boolean inColumnSection = false;
         ArrayList<String> columns = new ArrayList<>();
         for (String line : lines){
-            if (line.startsWith("Karush-Kuhn-Tucker") || line.startsWith("End of output")) {
+            if (line.startsWith("Karush-Kuhn-Tucker") || line.startsWith("End of output") || line.isEmpty()) {
                 inColumnSection = false;
             }
 
-            if (inColumnSection && !line.startsWith("-") && !line.isEmpty()) {
+            if (inColumnSection && !line.startsWith("-")) {
                 columns.add(line);
             }
 
@@ -129,6 +130,8 @@ public class Solver_GLPK implements Solver{
 
         // Call GLPK
         ProcessBuilder pb = new ProcessBuilder("glpsol", "--math", "input.temp", "-o", "output.temp");
+        pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+        pb.redirectError(ProcessBuilder.Redirect.DISCARD);
         Process p = pb.start();
         int exitCode = p.waitFor();
 
