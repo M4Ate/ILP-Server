@@ -37,7 +37,7 @@ public class Solver_GLPK implements Solver{
         for (Object var : vars){
             sb.append("var ");
             sb.append(var.toString());
-            sb.append(" >= 0;\n");
+            sb.append(" >= 0, integer;\n");
         }
         for (int i = 0; i < constraints.length(); i++){
             sb.append("s.t. ");
@@ -51,7 +51,6 @@ public class Solver_GLPK implements Solver{
         sb.append(optimizationFunc);
         sb.append(";\n");
         sb.append("end;");
-        System.out.println(sb);
         return sb.toString();
     }
 
