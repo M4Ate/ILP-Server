@@ -23,7 +23,7 @@ import org.json.JSONObject;
  */
 
 public class Server {
-    private static final int WORKER_THREADS = 1;
+    private static final int WORKER_THREADS = 4;
     private static final int DEFAULT_PORT = 1337;
     private static final BlockingQueue<Task> taskQueue = new LinkedBlockingQueue<>();
     private static final Solver solver = new Solver_GLPK();
