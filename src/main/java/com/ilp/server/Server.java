@@ -34,6 +34,7 @@ public class Server {
      * @param args command line arguments, the first argument is the port number
      * @throws IOException if an I/O error occurs
      */
+    @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) throws IOException {
         int port = args.length > 0 ? Integer.parseInt(args[0]) : DEFAULT_PORT;
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);

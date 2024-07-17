@@ -164,10 +164,11 @@ public class Solver_GLPK implements Solver {
         }
         reader.close();
 
-        file.delete();
+        boolean fd = file.delete();
+        boolean ofd = outputFile.delete();
 
-        if (!outputFile.delete()) {
-            System.out.println("Failed to delete output file, should not be an issue");
+        if (!fd || !ofd) {
+            System.out.println("A temporary file failed to be deleted, should not be an issue.");
         }
 
         return sb.toString();
