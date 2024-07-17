@@ -20,9 +20,7 @@ public class Task {
     }
 
     public void start() {
-        this.status = Status.RUNNING;
         this.output = solver.solve(input);
-        this.status = Status.FINISHED;
     }
 
     public Status getStatus() {

@@ -60,14 +60,13 @@ public class Server {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 } catch (IOException e) {
-
+                    System.out.println(e.getMessage());
                 }
             }
         };
 
         ExecutorService executor = java.util.concurrent.Executors.newFixedThreadPool(WORKER_THREADS);
         executor.execute(queueHandler);
-
 
         System.out.println("Server started on port " + port);
     }

@@ -1,31 +1,44 @@
 package com.ilp.server.solver;
 
+
+
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
-
-import java.io.*;
-import java.util.ArrayList;
 
 
 /**
  * Implementation for the GLPK ILP Solver.
- * @author maxroll
  */
 
-public class Solver_GLPK implements Solver{
-    public JSONObject solve(JSONObject input){
+public class Solver_GLPK implements Solver {
+
+    /**
+     * Solves the given problem using the GLPK ILP solver.
+     *
+     * @param input The JSON representation of the problem.
+     * @return The result of the solver.
+     */
+    public JSONObject solve(JSONObject input) {
         try {
             String glpkInput = translateToGLPK(input);
             String glpkOutput = callGLPK(glpkInput);
             return translateFromGLPK(glpkOutput);
-        } catch (IOException | InterruptedException | JSONException e){
+        } catch (IOException | InterruptedException | JSONException e) {
             return errorMsg(e.getMessage().replace("\"", "\\\""));
         }
     }
 
     /**
      * Translates the given JSON object to a GLPK input file.
+     *
      * @param input The JSON object to translate.
      * @return The GLPK input file.
      */
@@ -34,13 +47,13 @@ public class Solver_GLPK implements Solver{
         JSONArray constraints = input.getJSONArray("constraints");
         String optimizationFunc = input.get("optimizationFunction").toString();
         StringBuilder sb = new StringBuilder();
-        for (Object var : vars){
+        for (Object var : vars) {
             sb.append("var ");
             sb.append(var.toString());
             //sb.append(" binary;\n");            // using integer seems slightly faster
             sb.append(" >= 0, integer;\n");
         }
-        for (int i = 0; i < constraints.length(); i++){
+        for (int i = 0; i < constraints.length(); i++) {
             sb.append("s.t. ");
             sb.append("c_");
             sb.append(i);
@@ -57,16 +70,17 @@ public class Solver_GLPK implements Solver{
 
     /**
      * Translates the given GLPK output to a JSON object.
+     *
      * @param output The GLPK output to translate.
      * @return The JSON object.
      */
-    private JSONObject translateFromGLPK(String output){
+    private JSONObject translateFromGLPK(String output) {
         ArrayList<String> columns = parseColumnSection(output);
 
         // Could be prettier
         ArrayList<String> namesTemp = new ArrayList<>();
         ArrayList<String> valuesTemp = new ArrayList<>();
-        for (String column : columns){
+        for (String column : columns) {
             String[] parts = column.trim().split("\\s+");
             namesTemp.add(parts[1]);
             valuesTemp.add(parts[3]);
@@ -80,7 +94,7 @@ public class Solver_GLPK implements Solver{
         return convertToJSON(names, values);
     }
 
-    private ArrayList<String> parseColumnSection(String output){
+    private ArrayList<String> parseColumnSection(String output) {
         String[] lines = output.split("\n");
         boolean inColumnSection = false;
         ArrayList<String> columns = new ArrayList<>();
@@ -101,7 +115,7 @@ public class Solver_GLPK implements Solver{
         return columns;
     }
 
-    private JSONObject convertToJSON(String[] names, String[] values){
+    private JSONObject convertToJSON(String[] names, String[] values) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("error", false);
         jsonObject.put("errorMessage", "");
@@ -120,7 +134,7 @@ public class Solver_GLPK implements Solver{
     }
 
 
-    private String callGLPK(String input) throws IOException, InterruptedException{
+    private String callGLPK(String input) throws IOException, InterruptedException {
         // Write input to file
         File file = new File("input.temp");
 
@@ -135,7 +149,7 @@ public class Solver_GLPK implements Solver{
         Process p = pb.start();
         int exitCode = p.waitFor();
 
-        if (exitCode != 0){
+        if (exitCode != 0) {
             throw new IOException("GLPK exited with error code " + exitCode);
         }
 
@@ -151,7 +165,10 @@ public class Solver_GLPK implements Solver{
         reader.close();
 
         file.delete();
-        outputFile.delete();
+
+        if (!outputFile.delete()) {
+            System.out.println("Failed to delete output file, should not be an issue");
+        }
 
         return sb.toString();
     }
