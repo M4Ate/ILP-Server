@@ -67,7 +67,9 @@ public class Server {
         };
 
         ExecutorService executor = java.util.concurrent.Executors.newFixedThreadPool(WORKER_THREADS);
-        executor.execute(queueHandler);
+        for (int i = 0; i < WORKER_THREADS; i++) {
+            executor.execute(queueHandler);
+        }
 
         System.out.println("Server started on port " + port);
     }
