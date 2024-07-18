@@ -135,15 +135,20 @@ public class Solver_GLPK implements Solver {
 
 
     private String callGLPK(String input) throws IOException, InterruptedException {
+
+        // Randomize file names to avoid conflicts
+        int random = (int) (Math.random() * 1000000);
+        String inputFileName = "input" + random + ".temp";
+        String outputFileName = "output" + random + ".temp";
         // Write input to file
-        File file = new File("input.temp");
+        File file = new File(inputFileName);
 
         FileWriter writer = new FileWriter(file);
         writer.write(input);
         writer.close();
 
         // Call GLPK
-        ProcessBuilder pb = new ProcessBuilder("glpsol", "--math", "input.temp", "-o", "output.temp");
+        ProcessBuilder pb = new ProcessBuilder("glpsol", "--math", inputFileName, "-o", outputFileName);
         pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
         pb.redirectError(ProcessBuilder.Redirect.DISCARD);
         Process p = pb.start();
@@ -154,7 +159,7 @@ public class Solver_GLPK implements Solver {
         }
 
         // Read output from file
-        File outputFile = new File("output.temp");
+        File outputFile = new File(outputFileName);
         BufferedReader reader = new BufferedReader(new FileReader(outputFile));
         StringBuilder sb = new StringBuilder();
         String line;
