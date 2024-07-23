@@ -42,7 +42,7 @@ public class Solver_GLPK implements Solver {
      * @param input The JSON object to translate.
      * @return The GLPK input file.
      */
-    private String translateToGLPK(JSONObject input) throws JSONException {
+    protected String translateToGLPK(JSONObject input) throws JSONException {
         JSONArray vars = input.getJSONArray("variables");
         JSONArray constraints = input.getJSONArray("constraints");
         String optimizationFunc = input.get("optimizationFunction").toString();
@@ -134,7 +134,7 @@ public class Solver_GLPK implements Solver {
     }
 
 
-    private String callGLPK(String input) throws IOException, InterruptedException {
+    protected String callGLPK(String input) throws IOException, InterruptedException {
 
         // Randomize file names to avoid conflicts
         int random = (int) (Math.random() * 1000000);
