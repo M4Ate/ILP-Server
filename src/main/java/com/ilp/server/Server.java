@@ -1,7 +1,6 @@
 package com.ilp.server;
 
-import com.ilp.server.solver.Solver;
-import com.ilp.server.solver.Solver_GLPK;
+import com.ilp.server.solver.*;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -26,7 +25,7 @@ public class Server {
     private static final int WORKER_THREADS = 4;
     private static final int DEFAULT_PORT = 1337;
     private static final BlockingQueue<Task> taskQueue = new LinkedBlockingQueue<>();
-    private static final Solver solver = new Solver_GLPK();
+    private static final Solver solver = new Solver_HiGHS_CPLEX();
 
     /**
      * Main method that starts the server.

@@ -1,13 +1,12 @@
 package com.ilp.server.solver;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
 
-public class Solver_GLPK_MPS extends Solver_GLPK {
+public class Solver_GLPK_CPLEX extends Solver_GLPK {
     @Override
     protected String translateToGLPK(JSONObject input) throws JSONException {
         JSONArray vars = input.getJSONArray("variables");
@@ -15,72 +14,34 @@ public class Solver_GLPK_MPS extends Solver_GLPK {
         String optimizationFunc = input.get("optimizationFunction").toString();
         StringBuilder sb = new StringBuilder();
 
-        // NAME section
-        sb.append("NAME          PROBLEM\n");
-
-        // ROWS section
-        sb.append("ROWS\n");
-        sb.append(" N  OBJ\n");
+        sb.append("Minimize\n");
+        sb.append("    obj: ");
+        sb.append(optimizationFunc);
+        sb.append("\n");
+        sb.append("Subject To\n");
         for (int i = 0; i < constraints.length(); i++) {
-            sb.append(" L  C_");
+            sb.append("    c_");
             sb.append(i);
+            sb.append(": ");
+            sb.append(constraints.get(i));
             sb.append("\n");
         }
-
-        // COLUMNS section
-        sb.append("COLUMNS\n");
+        sb.append("Bounds\n");
         for (Object var : vars) {
-            String varName = var.toString();
-
-            // Add variable in the correct column
-            sb.append(padding(4));
-            sb.append(varName);
-            sb.append(padding(10 - varName.length()));
-
-
-            for (int i = 0; i < constraints.length(); i++) {
-                Object constraint = constraints.get(i);
-                if (constraint.toString().contains(varName)) {
-                    sb.append("C_");
-                    sb.append(i);
-                    sb.append(padding(19 - String.valueOf(i).length()));
-                    sb.append("1");
-                    sb.append(padding(3));
-                }
-            }
-
-            if (optimizationFunc.contains(varName)) {
-                sb.append("    OBJ     1");
-            }
-            sb.append("\n");
-        }
-
-        // RHS section
-        sb.append("RHS\n");
-        for (int i = 0; i < constraints.length(); i++) {
-            Object constraint = constraints.get(i);
-            String rhsValue = constraint.toString().split("=")[1].trim();
-            sb.append("    RHS    C_");
-            sb.append(i);
             sb.append("    ");
-            sb.append(rhsValue);
+            sb.append(var.toString());
+            sb.append(" <= 1\n");
+        }
+        sb.append("General\n");
+        for (Object var : vars) {
+            sb.append("    ");
+            sb.append(var.toString());
             sb.append("\n");
         }
-
-        // BOUNDS section
-        sb.append("BOUNDS\n");
-        for (Object var : vars) {
-            sb.append(" UI BND    ");
-            sb.append(var.toString());
-            sb.append("    1\n");
-        }
-
-        sb.append("ENDATA\n");
-
+        sb.append("End\n");
 
         return sb.toString();
     }
-
 
     @Override
     protected String callGLPK(String input) throws IOException, InterruptedException {
@@ -97,7 +58,7 @@ public class Solver_GLPK_MPS extends Solver_GLPK {
         writer.close();
 
         // Call GLPK
-        ProcessBuilder pb = new ProcessBuilder("glpsol", "--freemps", inputFileName, "-o", outputFileName);
+        ProcessBuilder pb = new ProcessBuilder("glpsol", "--lp", inputFileName, "-o", outputFileName);
         pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
         pb.redirectError(ProcessBuilder.Redirect.DISCARD);
         Process p = pb.start();
@@ -117,18 +78,14 @@ public class Solver_GLPK_MPS extends Solver_GLPK {
             sb.append("\n");
         }
         reader.close();
-        /*
+
         boolean fd = file.delete();
         boolean ofd = outputFile.delete();
 
         if (!fd || !ofd) {
             System.out.println("A temporary file failed to be deleted, should not be an issue.");
         }
-        */
-        return sb.toString();
-    }
 
-    private static String padding(int padding) {
-        return " ".repeat(Math.max(0, padding));
+        return sb.toString();
     }
 }
