@@ -145,16 +145,22 @@ public class Solver_HiGHS_CPLEX implements Solver {
         FileWriter writer = new FileWriter(file);
         writer.write(input);
         writer.close();
-
+        // Make sure options file is present
+        File optionsFile = new File("options");
+        FileWriter optionsWriter = new FileWriter(optionsFile);
+        optionsWriter.write("parallel = on\n" +
+                "threads =  16");
         // Call GLPK
-        ProcessBuilder pb = new ProcessBuilder("highs", inputFileName, "--solution_file", outputFileName);
+        ProcessBuilder pb = new ProcessBuilder("highs", inputFileName, "--solution_file", outputFileName, "--options_file", "options");//, "--options_file", "options"
         pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
         pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+
+        pb.environment().putAll(System.getenv());
         Process p = pb.start();
         int exitCode = p.waitFor();
 
         if (exitCode != 0) {
-            throw new IOException("GLPK exited with error code " + exitCode);
+            throw new IOException("HiGHS exited with error code " + exitCode);
         }
 
         // Read output from file
