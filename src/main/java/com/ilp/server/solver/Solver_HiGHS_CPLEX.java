@@ -146,10 +146,14 @@ public class Solver_HiGHS_CPLEX implements Solver {
         writer.write(input);
         writer.close();
         // Make sure options file is present
+
         File optionsFile = new File("options");
-        FileWriter optionsWriter = new FileWriter(optionsFile);
-        optionsWriter.write("parallel = on\n" +
-                "threads =  16");
+        if (!optionsFile.exists()) {
+            FileWriter optionsWriter = new FileWriter(optionsFile);
+            optionsWriter.write("parallel = on\n" +
+                                    "threads =  16");
+        }
+
         // Call GLPK
         ProcessBuilder pb = new ProcessBuilder("highs", inputFileName, "--solution_file", outputFileName, "--options_file", "options");//, "--options_file", "options"
         pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
