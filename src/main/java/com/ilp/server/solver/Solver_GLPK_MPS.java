@@ -117,14 +117,14 @@ public class Solver_GLPK_MPS extends Solver_GLPK {
             sb.append("\n");
         }
         reader.close();
-        /*
+
         boolean fd = file.delete();
         boolean ofd = outputFile.delete();
 
         if (!fd || !ofd) {
             System.out.println("A temporary file failed to be deleted, should not be an issue.");
         }
-        */
+
         return sb.toString();
     }
 
