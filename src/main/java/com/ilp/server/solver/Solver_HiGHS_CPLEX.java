@@ -19,7 +19,7 @@ public class Solver_HiGHS_CPLEX implements Solver {
     public JSONObject solve(JSONObject input) {
         try {
             String glpkInput = translateToGLPK(input);
-            String glpkOutput = callGLPK(glpkInput);
+            String glpkOutput = callSolver(glpkInput);
             return translateFromGLPK(glpkOutput);
         } catch (IOException | InterruptedException | JSONException e) {
             return errorMsg(e.getMessage().replace("\"", "\\\""));
@@ -36,6 +36,14 @@ public class Solver_HiGHS_CPLEX implements Solver {
         JSONArray vars = input.getJSONArray("variables");
         JSONArray constraints = input.getJSONArray("constraints");
         String optimizationFunc = input.get("optimizationFunction").toString();
+
+        optimizationFunc = optimizationFunc.replace("*", "");   // .lp format doesnt need the * operator
+        for (int i = 0; i < constraints.length(); i++) {
+            String constraint = constraints.getString(i);
+            constraint = constraint.replace("*", "");   // .lp format doesnt need the * operator
+            constraints.put(i, constraint);
+        }
+
         StringBuilder sb = new StringBuilder();
 
         sb.append("Minimize\n");
@@ -133,7 +141,7 @@ public class Solver_HiGHS_CPLEX implements Solver {
     }
 
 
-    protected String callGLPK(String input) throws IOException, InterruptedException {
+    protected String callSolver(String input) throws IOException, InterruptedException {
 
         // Randomize file names to avoid conflicts
         int random = (int) (Math.random() * 1000000);
@@ -148,11 +156,14 @@ public class Solver_HiGHS_CPLEX implements Solver {
         // Make sure options file is present
 
         File optionsFile = new File("options");
-        if (!optionsFile.exists()) {
+        if (optionsFile.createNewFile()) {
             FileWriter optionsWriter = new FileWriter(optionsFile);
-            optionsWriter.write("parallel = on\n" +
-                                    "threads =  16");
+            optionsWriter.write("""
+                    parallel = on
+                    threads =  16""");
+            optionsWriter.close();
         }
+
 
         // Call GLPK
         ProcessBuilder pb = new ProcessBuilder("highs", inputFileName, "--solution_file", outputFileName, "--options_file", "options");//, "--options_file", "options"
@@ -184,7 +195,6 @@ public class Solver_HiGHS_CPLEX implements Solver {
         if (!fd || !ofd) {
             System.out.println("A temporary file failed to be deleted, should not be an issue.");
         }
-
         return sb.toString();
     }
 
