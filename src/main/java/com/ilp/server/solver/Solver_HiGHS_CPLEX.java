@@ -175,6 +175,9 @@ public class Solver_HiGHS_CPLEX implements Solver {
         int exitCode = p.waitFor();
 
         if (exitCode != 0) {
+            switch (exitCode) {
+                case -1 -> throw new IOException("HiGHS could not be found in the PATH");
+            }
             throw new IOException("HiGHS exited with error code " + exitCode);
         }
 
