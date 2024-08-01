@@ -82,6 +82,10 @@ public class Solver_HiGHS_CPLEX implements Solver {
      * @return The JSON object.
      */
     private JSONObject translateFromGLPK(String output) {
+        if (!solvable(output)) {
+            return errorMsg("The problem is not solvable.");
+        }
+
         ArrayList<String> columns = parseColumnSection(output);
 
         // Could be prettier
@@ -198,6 +202,10 @@ public class Solver_HiGHS_CPLEX implements Solver {
         outputFile.delete();
 
         return sb.toString();
+    }
+
+    private boolean solvable(String output) {
+        return !output.contains("Infeasible");
     }
 
     private JSONObject errorMsg(String msg){
