@@ -21,7 +21,9 @@ public class Solver_HiGHS_CPLEX implements Solver {
             String glpkInput = translateToGLPK(input);
             String glpkOutput = callSolver(glpkInput);
             return translateFromGLPK(glpkOutput);
-        } catch (IOException | InterruptedException | JSONException e) {
+        } catch (IOException e) {
+            return errorMsg("HiGHS is not installed or not reachable.");
+        } catch (InterruptedException | JSONException e) {
             return errorMsg(e.getMessage().replace("\"", "\\\""));
         }
     }
@@ -36,6 +38,8 @@ public class Solver_HiGHS_CPLEX implements Solver {
         JSONArray vars = input.getJSONArray("variables");
         JSONArray constraints = input.getJSONArray("constraints");
         String optimizationFunc = input.get("optimizationFunction").toString();
+
+        if (constraints.isEmpty()) throw new JSONException("Cannot solve empty graph");
 
         optimizationFunc = optimizationFunc.replace("*", "");   // .lp format doesnt need the * operator
         for (int i = 0; i < constraints.length(); i++) {
@@ -179,9 +183,6 @@ public class Solver_HiGHS_CPLEX implements Solver {
         int exitCode = p.waitFor();
 
         if (exitCode != 0) {
-            switch (exitCode) {
-                case -1 -> throw new IOException("HiGHS could not be found in the PATH");
-            }
             throw new IOException("HiGHS exited with error code " + exitCode);
         }
 

@@ -42,4 +42,24 @@ class Solver_HiGHS_CPLEXTest {
         JSONObject output = solver.solve(input);
         assertEquals("{\"result\":[],\"errorMessage\":\"The problem is not solvable.\",\"error\":true}", output.toString());
     }
+
+    @Test
+    void notInstalled() {
+        Solver solver = new Solver_HiGHS_CPLEX_not_installed();
+        JSONObject input = new JSONObject("{\"minimize\":true,\"optimizationFunction\":\"z_c0 + z_c1 + z_c2\",\"variables\":[\"x_v0_c0\",\"x_v0_c1\",\"x_v0_c2\",\"x_v1_c0\",\"x_v1_c1\",\"x_v1_c2\",\"y_e0_c0\",\"y_e0_c1\",\"y_e0_c2\",\"z_c0\",\"z_c1\",\"z_c2\"],\"constraints\":[\"x_v0_c0 + x_v0_c1 + x_v0_c2 = 1\",\"x_v0_c0 = 1\",\"x_v1_c0 + x_v1_c1 + x_v1_c2 = 1\",\"x_v1_c0 = 1\",\"y_e0_c0 + y_e0_c1 + y_e0_c2 = 1\",\"x_v0_c0 + x_v1_c0 <= 1\",\"x_v0_c1 + x_v1_c1 <= 1\",\"x_v0_c2 + x_v1_c2 <= 1\",\"x_v0_c0 + y_e0_c0 <= 1\",\"x_v0_c1 + y_e0_c1 <= 1\",\"x_v0_c2 + y_e0_c2 <= 1\",\"x_v1_c0 + y_e0_c0 <= 1\",\"x_v1_c1 + y_e0_c1 <= 1\",\"x_v1_c2 + y_e0_c2 <= 1\",\"x_v0_c0 - z_c0 <= 0\",\"x_v0_c1 - z_c1 <= 0\",\"x_v0_c2 - z_c2 <= 0\",\"x_v1_c0 - z_c0 <= 0\",\"x_v1_c1 - z_c1 <= 0\",\"x_v1_c2 - z_c2 <= 0\",\"y_e0_c0 - z_c0 <= 0\",\"y_e0_c1 - z_c1 <= 0\",\"y_e0_c2 - z_c2 <= 0\"]}\n");
+
+        JSONObject output = solver.solve(input);
+        assertEquals("{\"result\":[],\"errorMessage\":\"HiGHS is not installed or not reachable.\",\"error\":true}", output.toString());
+    }
+
+    @Test
+    void invalidJson() {
+        Solver solver = new Solver_HiGHS_CPLEX();
+        JSONObject input = new JSONObject("{\"minimize\":true,\"optimizationFunction\":\"z_c0 + z_c1\",\"variables\":[\"z_c0\",\"z_c1\"],\"constraints\":[]}");
+        JSONObject output = solver.solve(input);
+        assertEquals("{\"result\":[],\"errorMessage\":\"Cannot solve empty graph\",\"error\":true}", output.toString());
+        input = new JSONObject();
+        output = solver.solve(input);
+        assertEquals("{\"result\":[],\"errorMessage\":\"JSONObject[\\\"variables\\\"] not found.\",\"error\":true}", output.toString());
+    }
 }
