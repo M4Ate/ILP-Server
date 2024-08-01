@@ -192,12 +192,11 @@ public class Solver_HiGHS_CPLEX implements Solver {
         }
         reader.close();
 
-        boolean fd = file.delete();
-        boolean ofd = outputFile.delete();
+        //noinspection ResultOfMethodCallIgnored
+        file.delete();
+        //noinspection ResultOfMethodCallIgnored
+        outputFile.delete();
 
-        if (!fd || !ofd) {
-            System.out.println("A temporary file failed to be deleted, should not be an issue.");
-        }
         return sb.toString();
     }
 

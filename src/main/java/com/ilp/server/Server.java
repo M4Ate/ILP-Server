@@ -25,7 +25,7 @@ public class Server {
     private static final int WORKER_THREADS = 4;
     private static final int DEFAULT_PORT = 1337;
     private static final BlockingQueue<Task> taskQueue = new LinkedBlockingQueue<>();
-    private static final Solver solver = new Solver_HiGHS_CPLEX();
+    private static Solver solver = new Solver_HiGHS_CPLEX();
 
     /**
      * Main method that starts the server.
@@ -36,6 +36,18 @@ public class Server {
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) throws IOException {
         int port = args.length > 0 ? Integer.parseInt(args[0]) : DEFAULT_PORT;
+        String solverType = args.length > 1 ? args[1] : "HiGHS_CPLEX";
+        switch (solverType) {
+            case "HiGHS_CPLEX":
+                solver = new Solver_HiGHS_CPLEX();
+                break;
+            case "Debug":
+                solver = new Solver_Debug();
+                break;
+            case "GLPK":
+                solver = new Solver_GLPK();
+                break;
+        }
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/post", new WebHandler());
         server.setExecutor(null);
