@@ -39,8 +39,6 @@ public class Server {
         int port = getPort(args);
         String solverType = getSolverType(args);
         switch (solverType) {
-
-
             case "GLPK":
             case "glpk":
                 solver = new Solver_GLPK();
@@ -50,14 +48,29 @@ public class Server {
                 solver = new Solver_Debug();
                 break;
 
-
             default:
                 System.out.println("Invalid solver type: " + solverType + ". Using HiGHS instead.");
             case "HiGHS":
             case "highs":
                 solver = new Solver_HiGHS_CPLEX();
                 break;
+
+            case "any":
+                if (solverInstalled(new Solver_GLPK())) {
+                    solver = new Solver_GLPK();
+                } else if (solverInstalled(new Solver_HiGHS_CPLEX())) {
+                    solver = new Solver_HiGHS_CPLEX();
+                } else {
+                    System.out.println("No solver found. Exiting.");
+                    System.exit(1);
+                }
         }
+
+        if (!solver.isAvailable()) {
+            System.out.println("Solver not available. Exiting.");
+            System.exit(1);
+        }
+
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/post", new WebHandler());
         server.setExecutor(null);
@@ -151,5 +164,9 @@ public class Server {
             }
         }
         return DEFAULT_SOLVER;
+    }
+
+    private static boolean solverInstalled(Solver solver) {
+        return solver.isAvailable();
     }
 }

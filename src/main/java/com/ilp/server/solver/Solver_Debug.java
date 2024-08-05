@@ -9,4 +9,9 @@ public class Solver_Debug implements Solver {
         System.out.println(input);
         return new JSONObject("{\"error\": true, \"errorMessage\": \"Your using the debug solver, this solver does not solve anything.\", \"result\": []}");
     }
+
+    @Override
+    public boolean isAvailable() {
+        return true;
+    }
 }

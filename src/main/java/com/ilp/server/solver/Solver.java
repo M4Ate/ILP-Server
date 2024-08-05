@@ -15,6 +15,11 @@ public interface Solver {
      */
     JSONObject solve(JSONObject input);
 
-
+    /**
+     * Checks if the solver is available.
+     *
+     * @return True if the solver is available, false otherwise.
+     */
+    boolean isAvailable();
 
 }

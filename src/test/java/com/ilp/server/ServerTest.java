@@ -1,5 +1,6 @@
 package com.ilp.server;
 
+
 import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,7 +58,16 @@ class ServerTest {
         }
     }
 
-
+    @Test
+    void anySolver() {
+        int port = getRandomPort();
+        assertDoesNotThrow(() -> Server.main(new String[]{"-p", String.valueOf(port), "-s", "any"}));
+        try {
+            assertEquals(MockClient.makeRequest(port), 200);
+        } catch (IOException | InterruptedException e) {
+            fail();
+        }
+    }
 
     @Test
     void jsonReadError() throws IOException {

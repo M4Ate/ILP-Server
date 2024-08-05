@@ -186,11 +186,25 @@ public class Solver_GLPK implements Solver {
         return sb.toString();
     }
 
+
+
     private boolean solvable(String output) {
         return !output.contains("INFEASIBLE");
     }
 
     private JSONObject errorMsg(String msg){
         return new JSONObject("{\"error\": true, \"errorMessage\": \"" + msg + "\", \"result\": []}");
+    }
+
+    public boolean isAvailable() {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("glpsol", "--version");
+            pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+            pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+            Process p = pb.start();
+            return p.waitFor() == 0;
+        } catch (IOException | InterruptedException e) {
+            return false;
+        }
     }
 }
