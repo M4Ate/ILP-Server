@@ -18,9 +18,9 @@ public class Solver_HiGHS_CPLEX implements Solver {
      */
     public JSONObject solve(JSONObject input) {
         try {
-            String glpkInput = translateToGLPK(input);
+            String glpkInput = translateToSolver(input);
             String glpkOutput = callSolver(glpkInput);
-            return translateFromGLPK(glpkOutput);
+            return translateFromSolver(glpkOutput);
         } catch (IOException e) {
             return errorMsg("HiGHS is not installed or not reachable.");
         } catch (InterruptedException | JSONException e) {
@@ -34,7 +34,7 @@ public class Solver_HiGHS_CPLEX implements Solver {
      * @param input The JSON object to translate.
      * @return The GLPK input file.
      */
-    protected String translateToGLPK(JSONObject input) throws JSONException {
+    protected String translateToSolver(JSONObject input) throws JSONException {
         JSONArray vars = input.getJSONArray("variables");
         JSONArray constraints = input.getJSONArray("constraints");
         String optimizationFunc = input.get("optimizationFunction").toString();
@@ -85,7 +85,7 @@ public class Solver_HiGHS_CPLEX implements Solver {
      * @param output The GLPK output to translate.
      * @return The JSON object.
      */
-    private JSONObject translateFromGLPK(String output) {
+    private JSONObject translateFromSolver(String output) {
         if (!solvable(output)) {
             return errorMsg("The problem is not solvable.");
         }

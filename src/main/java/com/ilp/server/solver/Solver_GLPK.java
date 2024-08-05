@@ -31,7 +31,9 @@ public class Solver_GLPK implements Solver {
             String glpkInput = translateToGLPK(input);
             String glpkOutput = callGLPK(glpkInput);
             return translateFromGLPK(glpkOutput);
-        } catch (IOException | InterruptedException | JSONException e) {
+        } catch (IOException e) {
+            return errorMsg("GLPK is not installed or not reachable.");
+        } catch (InterruptedException | JSONException e) {
             return errorMsg(e.getMessage().replace("\"", "\\\""));
         }
     }
@@ -46,6 +48,9 @@ public class Solver_GLPK implements Solver {
         JSONArray vars = input.getJSONArray("variables");
         JSONArray constraints = input.getJSONArray("constraints");
         String optimizationFunc = input.get("optimizationFunction").toString();
+
+        if (constraints.isEmpty()) throw new JSONException("Cannot solve empty graph");
+
         StringBuilder sb = new StringBuilder();
         for (Object var : vars) {
             sb.append("var ");
@@ -75,6 +80,10 @@ public class Solver_GLPK implements Solver {
      * @return The JSON object.
      */
     private JSONObject translateFromGLPK(String output) {
+        if (!solvable(output)) {
+            return errorMsg("The problem is not solvable.");
+        }
+
         ArrayList<String> columns = parseColumnSection(output);
 
         // Could be prettier
@@ -169,14 +178,16 @@ public class Solver_GLPK implements Solver {
         }
         reader.close();
 
-        boolean fd = file.delete();
-        boolean ofd = outputFile.delete();
-
-        if (!fd || !ofd) {
-            System.out.println("A temporary file failed to be deleted, should not be an issue.");
-        }
+       //noinspection ResultOfMethodCallIgnored
+        file.delete();
+        //noinspection ResultOfMethodCallIgnored
+        outputFile.delete();
 
         return sb.toString();
+    }
+
+    private boolean solvable(String output) {
+        return !output.contains("INFEASIBLE");
     }
 
     private JSONObject errorMsg(String msg){

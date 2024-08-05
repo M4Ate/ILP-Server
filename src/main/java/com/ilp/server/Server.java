@@ -24,8 +24,9 @@ import org.json.JSONObject;
 public class Server {
     private static final int WORKER_THREADS = 4;
     private static final int DEFAULT_PORT = 1337;
+    private static final String DEFAULT_SOLVER = "HiGHS";
     private static final BlockingQueue<Task> taskQueue = new LinkedBlockingQueue<>();
-    private static Solver solver = new Solver_HiGHS_CPLEX();
+    private static Solver solver;
 
     /**
      * Main method that starts the server.
@@ -35,17 +36,26 @@ public class Server {
      */
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) throws IOException {
-        int port = args.length > 0 ? Integer.parseInt(args[0]) : DEFAULT_PORT;
-        String solverType = args.length > 1 ? args[1] : "HiGHS_CPLEX";
+        int port = getPort(args);
+        String solverType = getSolverType(args);
         switch (solverType) {
-            case "HiGHS_CPLEX":
-                solver = new Solver_HiGHS_CPLEX();
+
+
+            case "GLPK":
+            case "glpk":
+                solver = new Solver_GLPK();
                 break;
+
             case "Debug":
                 solver = new Solver_Debug();
                 break;
-            case "GLPK":
-                solver = new Solver_GLPK();
+
+
+            default:
+                System.out.println("Invalid solver type: " + solverType + ". Using HiGHS instead.");
+            case "HiGHS":
+            case "highs":
+                solver = new Solver_HiGHS_CPLEX();
                 break;
         }
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
@@ -123,5 +133,23 @@ public class Server {
 
         // Parse the request body as JSON
         return new JSONObject(sb.toString());
+    }
+
+    private static int getPort(String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-p") && i + 1 < args.length) {
+                return Integer.parseInt(args[i + 1]);
+            }
+        }
+        return DEFAULT_PORT;
+    }
+
+    private static String getSolverType(String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-s") && i + 1 < args.length) {
+                return args[i + 1];
+            }
+        }
+        return DEFAULT_SOLVER;
     }
 }
