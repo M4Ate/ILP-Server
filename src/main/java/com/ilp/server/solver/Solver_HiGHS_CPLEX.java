@@ -24,6 +24,9 @@ public class Solver_HiGHS_CPLEX implements Solver {
         } catch (IOException e) {
             return errorMsg("HiGHS is not installed or not reachable.");
         } catch (InterruptedException | JSONException e) {
+            if(e.getMessage().contains("exited with error code 255")){
+                return errorMsg("An error occurred while solving the problem. Please check the logs for more information.");
+            }
             return errorMsg(e.getMessage().replace("\"", "\\\""));
         }
     }
@@ -183,7 +186,7 @@ public class Solver_HiGHS_CPLEX implements Solver {
         int exitCode = p.waitFor();
 
         if (exitCode != 0) {
-            throw new IOException("HiGHS exited with error code " + exitCode);
+            throw new InterruptedException("HiGHS exited with error code " + exitCode);
         }
 
         // Read output from file
