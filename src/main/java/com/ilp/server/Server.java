@@ -56,10 +56,10 @@ public class Server {
                 break;
 
             case "any":
-                if (solverInstalled(new Solver_GLPK())) {
-                    solver = new Solver_GLPK();
-                } else if (solverInstalled(new Solver_HiGHS_CPLEX())) {
+                if (solverInstalled(new Solver_HiGHS_CPLEX())) {
                     solver = new Solver_HiGHS_CPLEX();
+                } else if (solverInstalled(new Solver_GLPK())) {
+                    solver = new Solver_GLPK();
                 } else {
                     System.out.println("No solver found. Exiting.");
                     System.exit(1);
